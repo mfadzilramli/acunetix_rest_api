@@ -16,76 +16,48 @@ module AcunetixRestApi
       @https.verify_mode = OpenSSL::SSL::VERIFY_NONE
     end
 
-    # def call_api(api_type)
-    #
-    #   case api_type
-    #   when 'targets'
-    #     api_url = API_URL::TARGETS
-    #   when 'scans'
-    #     api_url = API_URL::SCANS
-    #   when 'groups'
-    #     api_url = API_URL::GROUPS
-    #   end
-    #
-    #   data = []
-    #   next_cursor = 0
-    #
-    #   loop do
-    #     request = Net::HTTP::Get.new(api_url + "?c=#{next_cursor}")
-    #     request["X-Auth"] = @api_key
-    #     request["Content-Type"] = MIME_TYPE::JSON
-    #     response = @https.request(request)
-    #     json_hash = JSON.parse(response.body)
-    #
-    #     json_hash[api_type].each do |obj|
-    #       data << obj
-    #     end
-    #     break if json_hash['pagination']['next_cursor'].nil?
-    #     next_cursor = json_hash['pagination']['next_cursor'].to_i
-    #   end
-    #   return data
-    # end
-
     def get_targets
-      self.call_api('targets')
+      self.call_api(API_URL::TARGETS, {category: 'targets'})
     end
 
     def get_scans
-      self.call_api('scans')
+      self.call_api(API_URL::SCANS, {category: 'scans'}, {c: 0})
     end
 
     def get_groups
-      self.call_api('groups')
+      self.call_api(API_URL::GROUPS, {category: 'groups'})
     end
 
-    def call_api(api_type)
+    def get_target_scans(target_id)
+      self.call_api(API_URL::SCANS, {category: 'scans'}, {q: target_id})
+    end
 
-      case api_type
-      when 'targets'
-        api_url = API_URL::TARGETS
-      when 'scans'
-        api_url = API_URL::SCANS
-      when 'groups'
-        api_url = API_URL::GROUPS
-      end
+    def call_api(api_path, opts = {}, params = {})
 
+      json_hash = {}
       data = []
-      next_cursor = 0
 
       loop do
-        request = Net::HTTP::Get.new(api_url + "?c=#{next_cursor}")
+        if params.empty?
+          path = api_path
+        else
+          path = api_path + "?" + URI.encode_www_form(params)
+        end
+
+        request = Net::HTTP::Get.new(path)
         request["X-Auth"] = @api_key
         request["Content-Type"] = MIME_TYPE::JSON
         response = @https.request(request)
         json_hash = JSON.parse(response.body)
 
-        json_hash[api_type].each do |obj|
+        json_hash[opts[:category]].each do |obj|
           data << obj
         end
+
         break if json_hash['pagination']['next_cursor'].nil?
-        next_cursor = json_hash['pagination']['next_cursor'].to_i
+        params[:c] = json_hash['pagination']['next_cursor'].to_i
       end
-      return data
+      return data # return array of hash
     end
 
   end
