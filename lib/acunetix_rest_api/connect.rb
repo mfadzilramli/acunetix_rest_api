@@ -16,62 +16,53 @@ module AcunetixRestApi
       @https.verify_mode = OpenSSL::SSL::VERIFY_NONE
     end
 
-    def get_all_scans
-      scans = []
-      counter = 0
+    module CALL_TYPE
+      TARGETS = '/api/v1/targets'
+      SCANS = '/api/v1/scans'
+      GROUPS = '/api/v1/target_groups'
+    end
+
+    def get(api_type)
+
+      case api_type
+      when 'targets'
+        api_url = CALL_TYPE::TARGETS
+      when 'scans'
+        api_url = CALL_TYPE::SCANS
+      when 'groups'
+        api_url = CALL_TYPE::GROUPS
+      end
+
+      data = []
+      next_cursor = 0
 
       loop do
-        request = Net::HTTP::Get.new("/api/v1/scans?c=#{counter}")
+        request = Net::HTTP::Get.new(api_url + "?c=#{next_cursor}")
         request["X-Auth"] = @api_key
         request["Content-Type"] = "application/json"
         response = @https.request(request)
         json_hash = JSON.parse(response.body)
 
-        json_hash['scans'].each do |object|
-          scans << object
+        json_hash[api_type].each do |obj|
+          data << obj
         end
         break if json_hash['pagination']['next_cursor'].nil?
-        counter += 100
+        next_cursor = json_hash['pagination']['next_cursor'].to_i
       end
-      return scans
+      return data
     end
 
-    def get_all_targets
-      targets = []
-      counter = 0
-
-      loop do
-        request = Net::HTTP::Get.new("/api/v1/targets?c=#{counter}")
-        request["X-Auth"] = @api_key
-        request["Content-Type"] = "application/json"
-        response = @https.request(request)
-        json_hash = JSON.parse(response.body)
-
-        json_hash['targets'].each do |object|
-          targets << object
-        end
-        break if json_hash['pagination']['next_cursor'].nil?
-        counter += 100
-      end
-      return targets
+    def get_targets
+      self.get('targets')
     end
 
-    def get_target_last_scan_info(target_id)
-      # https://172.16.129.94:3443/api/v1/targets/25efe9d4-b9c5-40a7-961d-d4088f9fdc91
-      request = Net::HTTP::Get.new("/api/v1/targets/#{target_id}")
-      request["X-Auth"] = @api_key
-      request["Content-Type"] = "application/json"
-      response = @https.request(request)
-      json_hash = JSON.parse(response.body)
+    def get_scans
+      self.get('scans')
     end
 
-    def get_scan_info(scan_id)
-      # https://172.16.129.94:3443/api/v1/targets/25efe9d4-b9c5-40a7-961d-d4088f9fdc91
-      request = Net::HTTP::Get.new("/api/v1/scans/#{scan_id}")
-      request["X-Auth"] = @api_key
-      request["Content-Type"] = "application/json"
-      response = @https.request(request)
-      json_hash = JSON.parse(response.body)
+    def get_groups
+      self.get('groups')
     end
+
   end
 end
