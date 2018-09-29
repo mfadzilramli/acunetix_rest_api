@@ -29,7 +29,7 @@ module AcunetixRestApi
     end
 
     def get_target_scans(target_id)
-      self.call_api(API_URL::SCANS, {category: 'scans'}, {q: target_id})
+      self.call_api(API_URL::SCANS, {category: 'scans'}, {q: "target_id:" + target_id})
     end
 
     def call_api(api_path, opts = {}, params = {})
