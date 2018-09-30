@@ -32,7 +32,7 @@ module AcunetixRestApi
       self.call_api(API_URL::SCANS, {category: 'scans'}, {q: "target_id:" + target_id})
     end
 
-    def get_scan_vulnerabilties(scan_id, scan_session_id)
+    def get_scan_vulnerabilities(scan_id, scan_session_id)
       self.call_api(API_URL::SCANS + "/" + scan_id + "/results/" + scan_session_id + "/vulnerabilities", {category: 'vulnerabilities'})
     end
 
