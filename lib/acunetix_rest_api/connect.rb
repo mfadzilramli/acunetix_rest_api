@@ -17,7 +17,7 @@ module AcunetixRestApi
     end
 
     def get_targets
-      self.call_api(API_URL::TARGETS, {category: 'targets'})
+      self.call_api(API_URL::TARGETS, {category: 'targets'}, {c: 0})
     end
 
     def get_scans
@@ -25,11 +25,15 @@ module AcunetixRestApi
     end
 
     def get_groups
-      self.call_api(API_URL::GROUPS, {category: 'groups'})
+      self.call_api(API_URL::GROUPS, {category: 'groups'}, {c: 0})
     end
 
     def get_target_scans(target_id)
       self.call_api(API_URL::SCANS, {category: 'scans'}, {q: "target_id:" + target_id})
+    end
+
+    def get_scan_vulnerabilties(scan_id, scan_session_id)
+      self.call_api(API_URL::SCANS + "/" + scan_id + "/results/" + scan_session_id + "/vulnerabilities", {category: 'vulnerabilities'})
     end
 
     def call_api(api_path, opts = {}, params = {})
@@ -50,8 +54,12 @@ module AcunetixRestApi
         response = @https.request(request)
         json_hash = JSON.parse(response.body)
 
-        json_hash[opts[:category]].each do |obj|
-          data << obj
+        if opts[:category].empty?
+          data << json_hash
+        else
+          json_hash[opts[:category]].each do |obj|
+            data << obj
+          end
         end
 
         break if json_hash['pagination']['next_cursor'].nil?
