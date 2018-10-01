@@ -8,4 +8,10 @@ module AcunetixRestApi
   module MIME_TYPE
     JSON = 'application/json'
   end
+
+  module VERB_TYPE
+    GET = 'get'
+    POST = 'post'
+  end
+  
 end

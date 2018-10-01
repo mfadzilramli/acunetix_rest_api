@@ -17,40 +17,42 @@ module AcunetixRestApi
     end
 
     def get_targets
-      self.call_api(API_URL::TARGETS, {category: 'targets'}, {c: 0})
+      self.call_api(VERB_TYPE::GET, API_URL::TARGETS, {category: 'targets'}, {c: 0})
     end
 
     def get_scans
-      self.call_api(API_URL::SCANS, {category: 'scans'}, {c: 0})
+      self.call_api(VERB_TYPE::GET, API_URL::SCANS, {category: 'scans'}, {c: 0})
     end
 
     def get_groups
-      self.call_api(API_URL::GROUPS, {category: 'groups'}, {c: 0})
+      self.call_api(VERB_TYPE::GET, API_URL::GROUPS, {category: 'groups'}, {c: 0})
     end
 
     def get_target_scans(target_id)
-      self.call_api(API_URL::SCANS, {category: 'scans'}, {q: "target_id:" + target_id})
+      self.call_api(VERB_TYPE::GET, API_URL::SCANS, {category: 'scans'}, {q: "target_id:" + target_id})
     end
 
     def get_scan_vulnerabilities(scan_id, scan_session_id)
-      self.call_api(API_URL::SCANS + "/" + scan_id + "/results/" + scan_session_id + "/vulnerabilities", {category: 'vulnerabilities'})
+      self.call_api(VERB_TYPE::GET, API_URL::SCANS + "/" + scan_id + "/results/" + scan_session_id + "/vulnerabilities", {category: 'vulnerabilities'})
     end
 
-    def call_api(api_path, opts = {}, params = {})
+    def call_api(method, api_path, opts = {}, params = {})
 
       json_hash = {}
       data = []
 
       loop do
-        if params.empty?
-          path = api_path
+        if method == VERB_TYPE::POST
+          request = Net::HTTP::Post.new(path)
+          request.set_form_data(params)
         else
-          path = api_path + "?" + URI.encode_www_form(params)
+          path = params.empty? ? api_path : path = api_path + "?" + URI.encode_www_form(params)
+          request = Net::HTTP::Get.new(path)
         end
 
-        request = Net::HTTP::Get.new(path)
         request["X-Auth"] = @api_key
-        request["Content-Type"] = MIME_TYPE::JSON
+        request.content_type = MIME_TYPE::JSON
+
         response = @https.request(request)
         json_hash = JSON.parse(response.body)
 
