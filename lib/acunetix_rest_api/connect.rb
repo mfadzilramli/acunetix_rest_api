@@ -17,23 +17,37 @@ module AcunetixRestApi
     end
 
     def get_targets
-      self.call_api(VERB_TYPE::GET, API_URL::TARGETS, {category: 'targets'}, {c: 0})
+      self.call_api(VERB_TYPE::GET,
+                    API_URL::TARGETS,
+                    {category: 'targets'},
+                    {c: 0})
     end
 
     def get_scans
-      self.call_api(VERB_TYPE::GET, API_URL::SCANS, {category: 'scans'}, {c: 0})
+      self.call_api(VERB_TYPE::GET,
+                    API_URL::SCANS,
+                    {category: 'scans'},
+                    {c: 0})
     end
 
     def get_groups
-      self.call_api(VERB_TYPE::GET, API_URL::GROUPS, {category: 'groups'}, {c: 0})
+      self.call_api(VERB_TYPE::GET,
+                    API_URL::GROUPS,
+                    {category: 'groups'},
+                    {c: 0})
     end
 
     def get_target_scans(target_id)
-      self.call_api(VERB_TYPE::GET, API_URL::SCANS, {category: 'scans'}, {q: "target_id:" + target_id})
+      self.call_api(VERB_TYPE::GET,
+                    API_URL::SCANS,
+                    {category: 'scans'},
+                    {q: "target_id:" + target_id})
     end
 
     def get_scan_vulnerabilities(scan_id, scan_session_id)
-      self.call_api(VERB_TYPE::GET, API_URL::SCANS + "/" + scan_id + "/results/" + scan_session_id + "/vulnerabilities", {category: 'vulnerabilities'})
+      self.call_api(VERB_TYPE::GET,
+                    API_URL::SCANS + "/" + scan_id + "/results/" + scan_session_id + "/vulnerabilities",
+                    {category: 'vulnerabilities'})
     end
 
     def call_api(method, api_path, opts = {}, params = {})
