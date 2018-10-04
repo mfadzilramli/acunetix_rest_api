@@ -10,8 +10,8 @@ module AcunetixRestApi
   end
 
   module VERB_TYPE
-    GET     = 'get'
-    POST    = 'post'
+    GET     = :get
+    POST    = :post
   end
 
 end
