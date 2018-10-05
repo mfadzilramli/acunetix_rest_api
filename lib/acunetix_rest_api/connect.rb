@@ -50,6 +50,13 @@ module AcunetixRestApi
                     {category: 'vulnerabilities'})
     end
 
+    def search_targets(targets)
+      self.call_api(VERB_TYPE::GET,
+                    API_URL::TARGETS,
+                    {category: 'targets'},
+                    {q: "text_search:*#{targets}"})
+    end
+
     def call_api(method, api_path, opts = {}, params = {})
 
       json_hash = {}
