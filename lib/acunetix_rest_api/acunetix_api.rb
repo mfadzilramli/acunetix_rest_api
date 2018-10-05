@@ -6,7 +6,7 @@ module AcunetixRestApi
   end
 
   module MIME_TYPE
-    JSON    = 'application/json'
+    JSON    = 'application/json, text/plain, */*'
   end
 
   module VERB_TYPE

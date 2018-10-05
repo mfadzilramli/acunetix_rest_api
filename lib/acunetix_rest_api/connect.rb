@@ -57,6 +57,12 @@ module AcunetixRestApi
                     {q: "text_search:*#{targets}"})
     end
 
+    def get_target_worker(target_id)
+      self.call_api(VERB_TYPE::GET,
+                    API_URL::TARGETS + "/" + target_id + "/configuration/workers",
+                    {category: 'workers'})
+    end
+
     def call_api(method, api_path, opts = {}, params = {})
 
       json_hash = {}
@@ -75,6 +81,7 @@ module AcunetixRestApi
         request.content_type = MIME_TYPE::JSON
 
         response = @https.request(request)
+
         json_hash = JSON.parse(response.body)
 
         if opts[:category].empty?
@@ -85,7 +92,12 @@ module AcunetixRestApi
           end
         end
 
-        break if json_hash['pagination']['next_cursor'].nil?
+        if !json_hash['pagination'].nil?
+          break if json_hash['pagination']['next_cursor'].nil?
+        else
+          break
+        end
+        
         params[:c] = json_hash['pagination']['next_cursor'].to_i
       end
       return data # return array of hash
