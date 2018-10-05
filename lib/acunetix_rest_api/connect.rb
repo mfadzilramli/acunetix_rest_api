@@ -81,11 +81,10 @@ module AcunetixRestApi
         request.content_type = MIME_TYPE::JSON
 
         response = @https.request(request)
-
         json_hash = JSON.parse(response.body)
 
-        if opts[:category].empty?
-          data << json_hash
+        if json_hash['code'] == 404
+          break
         else
           json_hash[opts[:category]].each do |obj|
             data << obj
@@ -97,7 +96,7 @@ module AcunetixRestApi
         else
           break
         end
-        
+
         params[:c] = json_hash['pagination']['next_cursor'].to_i
       end
       return data # return array of hash
