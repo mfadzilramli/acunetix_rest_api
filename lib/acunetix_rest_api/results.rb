@@ -1,5 +1,6 @@
 module AcunetixRestApi
   class Results
+
     def self.uniq_findings(vulnerabilities)
       uniq_vulns = vulnerabilities.group_by.map do |vulnerability|
         [vulnerability['vt_name'],
@@ -19,7 +20,7 @@ module AcunetixRestApi
           uniq_vuln_stats[:info] += 1
         end
       end
-      return uniq_vulns, uniq_vuln_stats
+      return uniq_vulns.uniq, uniq_vuln_stats
     end
   end
 end
