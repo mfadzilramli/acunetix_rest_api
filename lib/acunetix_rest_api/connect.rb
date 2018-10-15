@@ -63,10 +63,10 @@ module AcunetixRestApi
                     {category: 'workers'})
     end
 
-    def uniq_findings(scan_id, scan_session_id)
+    def uniq_findings(vulnerabilities)
       uniq_vuln = Hash.new(0)
 
-      vulns = self.get_scan_vulnerabilities(scan_id, scan_session_id).group_by.map do |vulnerability|
+      vulns = vulnerabilities.group_by.map do |vulnerability|
         [vulnerability['vt_name'], vulnerability['severity']]
       end
 
