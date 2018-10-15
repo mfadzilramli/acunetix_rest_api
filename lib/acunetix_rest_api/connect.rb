@@ -57,7 +57,7 @@ module AcunetixRestApi
       self.call_api(VERB_TYPE::GET,
                     API_URL::VULNS,
                     {category: 'vulnerabilities'},
-                    {q: "severity:3,2,1;status:open;target_id:" + target_id})
+                    {q: "severity:3,2,1,0;status:open;target_id:" + target_id})
     end
 
     def search_targets(targets)
