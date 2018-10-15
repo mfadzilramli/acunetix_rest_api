@@ -52,6 +52,14 @@ module AcunetixRestApi
                     {category: 'vulnerabilities'})
     end
 
+    def get_target_vulnerabilities(target_id)
+      # GET https://172.16.13.132:3443/api/v1/vulnerabilities?q=severity:3,2,1;status:open;target_id:cd8a2fc1-6942-46a1-9f96-93b79dd79d16 HTTP/1.1
+      self.call_api(VERB_TYPE::GET,
+                    API_URL::VULNS,
+                    {category: 'vulnerabilities'},
+                    {q: "severity:3,2,1;status:open;target_id:" + target_id})
+    end
+
     def search_targets(targets)
       self.call_api(VERB_TYPE::GET,
                     API_URL::TARGETS,
@@ -85,7 +93,7 @@ module AcunetixRestApi
         request.content_type = MIME_TYPE::JSON
 
         response = @https.request(request)
-        json_hash = JSON.parse(response.body)
+        puts json_hash = JSON.parse(response.body)
 
         if json_hash['code'] == 404
           break
@@ -96,7 +104,7 @@ module AcunetixRestApi
         end
 
         if !json_hash['pagination'].nil?
-          break if json_hash['pagination']['next_cursor'].nil?
+          break if json_hash['pagination']['next_cursor'].nil? || (json_hash['pagination']['next_cursor'].is_a? String)
         else
           break
         end
