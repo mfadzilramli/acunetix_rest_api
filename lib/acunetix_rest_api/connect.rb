@@ -6,11 +6,13 @@ module AcunetixRestApi
 
   class Connect
 
-    def initialize(api_key: nil, acunetix_host: nil)
-      @api_key = api_key
-      @acunetix_host = acunetix_host
+    attr_accessor :api_key, :host
 
-      uri = URI.parse(acunetix_host)
+    def initialize(api_key: nil, host: nil)
+      @api_key = api_key
+      @host = host
+
+      uri = URI.parse(host)
       @https = Net::HTTP.new(uri.host, uri.port)
       @https.use_ssl = true
       @https.verify_mode = OpenSSL::SSL::VERIFY_NONE
@@ -63,38 +65,18 @@ module AcunetixRestApi
                     {category: 'workers'})
     end
 
-    def uniq_findings(vulnerabilities)
-      uniq_vuln = Hash.new(0)
-
-      vulns = vulnerabilities.group_by.map do |vulnerability|
-        [vulnerability['vt_name'], vulnerability['severity']]
-      end
-
-      vulns.uniq.each do |vuln_name, severity|
-        case severity
-        when 3
-          uniq_vuln[:high] += 1
-        when 2
-          uniq_vuln[:medium] += 1
-        when 1
-          uniq_vuln[:low] += 1
-        when 0
-          uniq_vuln[:info] += 1
-        end
-      end
-      return uniq_vuln
-    end
-
     def call_api(method, api_path, opts = {}, params = {})
 
-      json_hash = {}
-      data = []
+      json_hash = Hash.new
+      data = Array.new
 
       loop do
-        if method == VERB_TYPE::POST
+
+        case method
+        when VERB_TYPE::POST
           request = Net::HTTP::Post.new(path)
           request.set_form_data(params)
-        else
+        when VERB_TYPE::GET
           path = params.empty? ? api_path : path = api_path + "?" + URI.encode_www_form(params)
           request = Net::HTTP::Get.new(path)
         end
