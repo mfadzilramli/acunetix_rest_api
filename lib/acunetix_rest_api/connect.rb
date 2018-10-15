@@ -63,6 +63,28 @@ module AcunetixRestApi
                     {category: 'workers'})
     end
 
+    def uniq_findings(scan_id, scan_session_id)
+      uniq_vuln = Hash.new(0)
+
+      vulns = self.get_scan_vulnerabilities(scan_id, scan_session_id).group_by.map do |vulnerability|
+        [vulnerability['vt_name'], vulnerability['severity']]
+      end
+
+      vulns.uniq.each do |vuln_name, severity|
+        case severity
+        when 3
+          uniq_vuln[:high] += 1
+        when 2
+          uniq_vuln[:medium] += 1
+        when 1
+          uniq_vuln[:low] += 1
+        when 0
+          uniq_vuln[:info] += 1
+        end
+      end
+      return uniq_vuln
+    end
+
     def call_api(method, api_path, opts = {}, params = {})
 
       json_hash = {}
