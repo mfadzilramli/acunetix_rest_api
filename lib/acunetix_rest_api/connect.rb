@@ -104,12 +104,16 @@ module AcunetixRestApi
         end
 
         if !json_hash['pagination'].nil?
-          break if json_hash['pagination']['next_cursor'].nil? || (json_hash['pagination']['next_cursor'].is_a? String)
+          break if json_hash['pagination']['next_cursor'].nil?
         else
           break
         end
 
-        params[:c] = json_hash['pagination']['next_cursor'].to_i
+        if (json_hash['pagination']['next_cursor'].is_a? String)
+          params[:c] = json_hash['pagination']['next_cursor']
+        else
+          params[:c] = json_hash['pagination']['next_cursor'].to_i
+        end
       end
       return data # return array of hash
     end
