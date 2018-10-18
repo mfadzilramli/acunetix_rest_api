@@ -5,7 +5,6 @@ module AcunetixRestApi
   require 'json'
 
   class Connect
-
     attr_accessor :api_key, :host
 
     def initialize(api_key: nil, host: nil)
@@ -53,7 +52,6 @@ module AcunetixRestApi
     end
 
     def get_target_vulnerabilities(target_id)
-      # GET https://172.16.13.132:3443/api/v1/vulnerabilities?q=severity:3,2,1;status:open;target_id:cd8a2fc1-6942-46a1-9f96-93b79dd79d16 HTTP/1.1
       self.call_api(VERB_TYPE::GET,
                     API_URL::VULNS,
                     {category: 'vulnerabilities'},
@@ -93,27 +91,21 @@ module AcunetixRestApi
         request.content_type = MIME_TYPE::JSON
 
         response = @https.request(request)
-        puts json_hash = JSON.parse(response.body)
+        json_hash = JSON.parse(response.body)
 
-        if json_hash['code'] == 404
-          break
-        else
-          json_hash[opts[:category]].each do |obj|
-            data << obj
-          end
+        break if json_hash['code'] == 404
+        json_hash[opts[:category]].each do |obj|
+          data << obj
         end
-
+        # check if pagination exists else break, then check if next_cursor exists else break from loop
         if !json_hash['pagination'].nil?
           break if json_hash['pagination']['next_cursor'].nil?
         else
           break
         end
 
-        if (json_hash['pagination']['next_cursor'].is_a? String)
-          params[:c] = json_hash['pagination']['next_cursor']
-        else
-          params[:c] = json_hash['pagination']['next_cursor'].to_i
-        end
+        params[:c] = (json_hash['pagination']['next_cursor'].is_a? String) ? json_hash['pagination']['next_cursor'] : json_hash['pagination']['next_cursor'].to_i
+
       end
       return data # return array of hash
     end

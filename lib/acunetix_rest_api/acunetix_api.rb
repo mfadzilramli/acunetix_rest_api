@@ -17,4 +17,11 @@ module AcunetixRestApi
     POST    = :post
   end
 
+  module SEVERITY
+    HIGH = 3
+    MEDIUM = 2
+    LOW = 1
+    INFO = 0
+  end
+
 end

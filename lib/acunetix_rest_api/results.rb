@@ -2,25 +2,28 @@ module AcunetixRestApi
   class Results
 
     def self.uniq_findings(vulnerabilities)
-      uniq_vulns = vulnerabilities.group_by.map do |vulnerability|
-        [vulnerability['vt_name'],
-        vulnerability['severity']]
+      uniq_vuln_stats = Hash.new(0)
+
+      vulns = vulnerabilities.group_by.map do |vuln|
+        [
+          vuln['vt_name'],
+          vuln['severity']
+        ]
       end
 
-      uniq_vuln_stats = Hash.new(0)
-      uniq_vulns.uniq.each do |vuln_name, severity|
+      vulns.uniq.each do |vuln_name, severity|
         case severity
-        when 3
+        when SEVERITY::HIGH
           uniq_vuln_stats[:high] += 1
-        when 2
+        when SEVERITY::MEDIUM
           uniq_vuln_stats[:medium] += 1
-        when 1
+        when SEVERITY::LOW
           uniq_vuln_stats[:low] += 1
-        when 0
+        when SEVERITY::INFO
           uniq_vuln_stats[:info] += 1
         end
       end
-      return uniq_vulns.uniq, uniq_vuln_stats
+      return vulns.uniq, uniq_vuln_stats
     end
   end
 end
