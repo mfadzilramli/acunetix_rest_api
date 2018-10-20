@@ -87,22 +87,21 @@ module AcunetixRestApi
           request = Net::HTTP::Get.new(path)
         end
 
+        # set request header
         request["X-Auth"] = @api_key
         request.content_type = MIME_TYPE::JSON
 
         response = @https.request(request)
         json_hash = JSON.parse(response.body)
 
+        # if loop, append all output to data
         break if json_hash['code'] == 404
-        json_hash[opts[:category]].each do |obj|
-          data << obj
+        json_hash[opts[:category]].each do |element|
+          data << element
         end
-        # check if pagination exists else break, then check if next_cursor exists else break from loop
-        if !json_hash['pagination'].nil?
-          break if json_hash['pagination']['next_cursor'].nil?
-        else
-          break
-        end
+
+        # check if pagination and next_cursor hash key exists else break from loop
+        break unless (json_hash['pagination'].has_key? :pagination) && (json_hash['pagination'].has_key? :next_cursor)
 
         params[:c] = (json_hash['pagination']['next_cursor'].is_a? String) ? json_hash['pagination']['next_cursor'] : json_hash['pagination']['next_cursor'].to_i
 

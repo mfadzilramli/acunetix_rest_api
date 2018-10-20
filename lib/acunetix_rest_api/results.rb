@@ -23,6 +23,7 @@ module AcunetixRestApi
           uniq_vuln_stats[:info] += 1
         end
       end
+
       return vulns.uniq, uniq_vuln_stats
     end
   end
