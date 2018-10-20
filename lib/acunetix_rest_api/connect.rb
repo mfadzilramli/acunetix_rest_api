@@ -101,8 +101,8 @@ module AcunetixRestApi
         end
 
         # check if pagination and next_cursor hash key exists else break from loop
-        # break unless (json_hash.has_key? :pagination) || (json_hash['pagination'].has_key? :next_cursor)
-        if !json_hash['pagination'].nil?
+        # break unless (!json_hash.has_key? ('pagination')) && (!json_hash.has_key? ('next_cursor'))
+        if json_hash.has_key? ('pagination')
           break if json_hash['pagination']['next_cursor'].nil?
         else
           break
